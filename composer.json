@@ -1,0 +1,28 @@
+{
+  "name": "gzdsx/openai",
+  "version": "1.0.0",
+  "description": "PHP SDK for OpenAi",
+  "keywords": [
+    "OpenAi",
+    "OpenAi Sdk"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/gzdsx/openai",
+  "authors": [
+    {
+      "name": "gzdsx",
+      "email": "307718818@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "OpenAi\\": "src/OpenAi"
+    }
+  }
+}
