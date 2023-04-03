@@ -91,186 +91,181 @@ class OpenAiClient
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @param null $streamFunc
      * @return OpenAiResponse
-     * @throws \Exception
+     * @throws OpenAiInvalidException
      */
-    public function completions(OpenAiRequestConfig $requestConfig, $streamFunc = null)
+    public function completions(OpenAiRequestConfig $config, $streamFunc = null)
     {
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
-
-        if ($requestConfig->stream && !$streamFunc) {
+        if ($config->stream && !$streamFunc) {
             throw new OpenAiInvalidException('Please provide a stream function.');
+        }
+
+        if (!$config->model) {
+            $config->model = OpenAiModels::$text_davinci_003;
         }
 
         $url = $this->api . '/completions';
-        return $this->sendRequest($url, 'POST', $options, $streamFunc);
+        return $this->sendRequest($url, 'POST', $config->toArray(), $streamFunc);
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @param null $streamFunc
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function chat(OpenAiRequestConfig $requestConfig, $streamFunc = null)
+    public function chatCompletions(OpenAiRequestConfig $config, $streamFunc = null)
     {
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
-
-        if (!array_key_exists('messages', $options)) {
+        if (!$config->messages) {
             throw new OpenAiInvalidException('missing param messages!');
         }
 
-        if (!is_array($options['messages'])) {
+        if (!is_array($config->messages)) {
             throw new OpenAiInvalidException('param messages must be an array!');
         }
 
-        if ($requestConfig->stream && !$streamFunc) {
+        if ($config->stream && !$streamFunc) {
             throw new OpenAiInvalidException('Please provide a stream function.');
         }
 
+        if (!$config->model) {
+            $config->model = OpenAiModels::$gpt_4;
+        }
+
         $url = $this->api . '/chat/completions';
-        return $this->sendRequest($url, 'POST', $options, $streamFunc);
+        return $this->sendRequest($url, 'POST', $config->toArray(), $streamFunc);
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
-     * @throws \Exception
+     * @throws OpenAiInvalidException
      */
-    public function edit(OpenAiRequestConfig $requestConfig)
+    public function edits(OpenAiRequestConfig $config)
     {
-        if (!$requestConfig->instruction) {
+        if (!$config->instruction) {
             throw new OpenAiInvalidException('missing param instruction!');
         }
 
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
-
-        $url = $this->api . '/edits';
-        return $this->sendRequest($url, 'POST', $options);
-    }
-
-    /**
-     * @param OpenAiRequestConfig $requestConfig
-     * @return OpenAiResponse
-     * @throws \Exception
-     */
-    public function imageGenerate(OpenAiRequestConfig $requestConfig)
-    {
-        if (!$requestConfig->prompt) {
-            throw new OpenAiInvalidException('missing param prompt!');
+        if (!$config->model) {
+            $config->model = OpenAiModels::$text_davinci_edit_001;
         }
 
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
-
-        $url = $this->api . '/images/generations';
-        return $this->sendRequest($url, 'POST', $options);
+        $url = $this->api . '/edits';
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function imageEdit(OpenAiRequestConfig $requestConfig)
+    public function imageGenerations(OpenAiRequestConfig $config)
     {
-        if (!$requestConfig->image) {
+        if (!$config->prompt) {
+            throw new OpenAiInvalidException('missing param prompt!');
+        }
+
+        $url = $this->api . '/images/generations';
+        return $this->sendRequest($url, 'POST', $config->toArray());
+    }
+
+    /**
+     * @param OpenAiRequestConfig $config
+     * @return OpenAiResponse
+     * @throws OpenAiInvalidException
+     */
+    public function imageEdits(OpenAiRequestConfig $config)
+    {
+        if (!$config->image) {
             throw new OpenAiInvalidException('missing param image!');
         }
 
-        if (!$requestConfig->prompt) {
+        if (!$config->prompt) {
             throw new OpenAiInvalidException('missing param prompt!');
         }
 
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
-
         $url = $this->api . '/images/edits';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function imageVariation(OpenAiRequestConfig $requestConfig)
+    public function imageVariations(OpenAiRequestConfig $config)
     {
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
 
-        if (!$requestConfig->image) {
+        if (!$config->image) {
             throw new OpenAiInvalidException('missing param image!');
         }
 
         $url = $this->api . '/images/variations';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function embeddings(OpenAiRequestConfig $requestConfig)
+    public function embeddings(OpenAiRequestConfig $config)
     {
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
 
-        if (!$requestConfig->input) {
+        if (!$config->input) {
             throw new OpenAiInvalidException('missing param input!');
         }
 
+        if (!$config->model) {
+            $config->model = OpenAiModels::$text_embedding_ada_002;
+        }
+
         $url = $this->api . '/embeddings';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
 
     /**
      * ID of the model to use. Only whisper-1 is currently available.
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function audioTranscription(OpenAiRequestConfig $requestConfig)
+    public function audioTranscriptions(OpenAiRequestConfig $config)
     {
-        if ($requestConfig->model) {
-            $requestConfig->model = 'whisper-1';
-        }
-
-        if (!$requestConfig->file) {
+        if (!$config->file) {
             throw new OpenAiInvalidException('missing param file!');
         }
 
-        $options = $requestConfig->toArray();
+        if (!$config->model) {
+            $config->model = OpenAiModels::$whisper_1;
+        }
+
         $url = $this->api . '/audio/transcriptions';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
      * ID of the model to use. Only whisper-1 is currently available.
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function audioTranslation(OpenAiRequestConfig $requestConfig)
+    public function audioTranslations(OpenAiRequestConfig $config)
     {
-        if ($requestConfig->model) {
-            $requestConfig->model = 'whisper-1';
-        }
-
-        if (!$requestConfig->file) {
+        if (!$config->file) {
             throw new OpenAiInvalidException('missing param file!');
         }
 
-        $options = $requestConfig->toArray();
+        if (!$config->model) {
+            $config->model = OpenAiModels::$whisper_1;
+        }
+
         $url = $this->api . '/audio/translations';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
@@ -286,25 +281,24 @@ class OpenAiClient
 
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function uploadFile(OpenAiRequestConfig $requestConfig)
+    public function uploadFile(OpenAiRequestConfig $config)
     {
 
-        if (!$requestConfig->file) {
+        if (!$config->file) {
             throw new OpenAiInvalidException('missing param file!');
         }
 
-        if (!$requestConfig->purpose) {
-            $requestConfig->purpose = 'fine-tune';
+        if (!$config->purpose) {
+            $config->purpose = 'fine-tune';
         }
 
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
+
         $url = $this->api . '/files';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
@@ -351,20 +345,22 @@ class OpenAiClient
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function fineTune(OpenAiRequestConfig $requestConfig)
+    public function fineTunes(OpenAiRequestConfig $config)
     {
-        if (!$requestConfig->training_file) {
+        if (!$config->training_file) {
             throw new OpenAiInvalidException('missing param training_file!');
         }
 
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
+        if ($config->model) {
+            $config->model = OpenAiModels::$davinci;
+        }
+
         $url = $this->api . '/fine-tunes';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
@@ -401,24 +397,22 @@ class OpenAiClient
     }
 
     /**
-     * @param OpenAiRequestConfig $requestConfig
+     * @param OpenAiRequestConfig $config
      * @return OpenAiResponse
      * @throws OpenAiInvalidException
      */
-    public function moderation(OpenAiRequestConfig $requestConfig)
+    public function moderation(OpenAiRequestConfig $config)
     {
-        if ($requestConfig->model) {
-            $requestConfig->model = 'text-moderation-latest';
+        if ($config->model) {
+            $config->model = OpenAiModels::$text_moderation_latest;
         }
 
-        if (!$requestConfig->input) {
+        if (!$config->input) {
             throw  new OpenAiInvalidException('missing param input');
         }
 
-        $options = $requestConfig->toArray();
-        $this->validateOptions($options);
         $url = $this->api . '/moderations';
-        return $this->sendRequest($url, 'POST', $options);
+        return $this->sendRequest($url, 'POST', $config->toArray());
     }
 
     /**
@@ -434,17 +428,6 @@ class OpenAiClient
     }
 
     /**
-     * @param $options
-     * @throws \Exception
-     */
-    protected function validateOptions($options)
-    {
-        if (!isset($options['model']) || is_null($options['model'])) {
-            throw new OpenAiInvalidException('missing param model!');
-        }
-    }
-
-    /**
      * @param $url
      * @param string $method
      * @param array $options
@@ -454,17 +437,17 @@ class OpenAiClient
      */
     protected function sendRequest($url, $method = 'POST', $options = [], $steamFunc = null)
     {
-        $headers = [];
         if (!$this->key) {
             throw new OpenAiInvalidException('missing openai key');
-        } else {
-            $headers[] = 'Authorization: Bearer ' . $this->key;
         }
 
+        $headers[] = 'Authorization: Bearer ' . $this->key;
         if (array_key_exists('file', $options) || array_key_exists('image', $options)) {
             $headers[] = 'Content-Type: multipart/form-data';
+            $postData = $options;
         } else {
             $headers[] = 'Content-Type: application/json';
+            $postData = json_encode($options);
         }
 
 
@@ -484,9 +467,9 @@ class OpenAiClient
             CURLOPT_HTTPHEADER => $headers,
         ];
 
-        if (!empty($options)) {
+        if (strtoupper($method) == 'POST') {
             $curl_info[CURLOPT_POST] = true;
-            $curl_info[CURLOPT_POSTFIELDS] = json_encode($options);
+            $curl_info[CURLOPT_POSTFIELDS] = $postData;
         }
 
         if ($this->proxy) {
@@ -514,7 +497,7 @@ class OpenAiClient
     public function setProxy($proxy)
     {
         if ($proxy && strpos($proxy, '://') === false) {
-            $proxy = 'https://'.$proxy;
+            $proxy = 'https://' . $proxy;
         }
         $this->proxy = $proxy;
     }

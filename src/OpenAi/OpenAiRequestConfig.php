@@ -95,10 +95,7 @@ namespace OpenAi;
  */
 class OpenAiRequestConfig
 {
-    protected $options = [
-        'model' => 'text-davinci-003',
-        'temperature' => 1
-    ];
+    protected $options = [];
 
     /**
      * ChatRequestMessage constructor.
@@ -130,6 +127,14 @@ class OpenAiRequestConfig
         }
 
         return $this->options;
+    }
+
+    /**
+     * @return false|string
+     */
+    public function toJson()
+    {
+        return json_encode($this->toArray());
     }
 
     public function __set($name, $value)
