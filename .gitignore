@@ -1,8 +1,4 @@
 /node_modules
-/public/hot
-/public/storage
-/public/apk
-/storage/*.key
 /vendor
 /.idea
 /.vscode
@@ -14,4 +10,3 @@ npm-debug.log
 yarn-error.log
 .env
 .DS_store
-/nbproject/private/
