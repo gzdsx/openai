@@ -26,6 +26,8 @@ class OpenAiClient
     private $org_id = null;
     private $timeout = 0;
     private $proxy = "";
+    private $proxyType = CURLPROXY_SOCKS5_HOSTNAME;
+    private $proxyPort = "1080";
     private $curlInfo = [];
 
     public function __construct($key = null, $org_id = null)
@@ -474,6 +476,8 @@ class OpenAiClient
 
         if ($this->proxy) {
             $curl_info[CURLOPT_PROXY] = $this->proxy;
+            $curl_info[CURLOPT_PROXYPORT] = $this->proxyPort;
+            $curl_info[CURLOPT_PROXYTYPE] = $this->proxyType;
         }
 
         if (array_key_exists('stream', $options) && $options['stream']) {
@@ -500,5 +504,21 @@ class OpenAiClient
             $proxy = 'https://' . $proxy;
         }
         $this->proxy = $proxy;
+    }
+
+    /**
+     * @param int $proxyType
+     */
+    public function setProxyType(int $proxyType)
+    {
+        $this->proxyType = $proxyType;
+    }
+
+    /**
+     * @param string $proxyPort
+     */
+    public function setProxyPort(string $proxyPort)
+    {
+        $this->proxyPort = $proxyPort;
     }
 }

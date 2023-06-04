@@ -1,6 +1,6 @@
 {
   "name": "gzdsx/openai",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "PHP SDK for OpenAi",
   "keywords": [
     "OpenAi",
