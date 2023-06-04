@@ -500,9 +500,6 @@ class OpenAiClient
      */
     public function setProxy($proxy)
     {
-        if ($proxy && strpos($proxy, '://') === false) {
-            $proxy = 'https://' . $proxy;
-        }
         $this->proxy = $proxy;
     }
 
